@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARCHIVO PERDIDO — Transmisiones desde el fin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+  <!-- ═══════════════════════════════════════════════════════
+       PEGA TU URL Y CLAVE ANÓNIMA DE SUPABASE AQUÍ
+       ═══════════════════════════════════════════════════════ -->
+  <script>
+    const SUPABASE_URL = 'PEGA_TU_URL_AQUI';
+    const SUPABASE_KEY = 'PEGA_TU_CLAVE_ANON_AQUI';
+  </script>
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg:         #080a06;
+      --bg-2:       #0e110b;
+      --bg-3:       #141810;
+      --text:       #c8c3b4;
+      --text-dim:   #7a7568;
+      --text-faint: #3a3830;
+      --blood:      #8b1a1a;
+      --blood-lit:  #b52222;
+      --amber:      #c47a1a;
+      --olive:      #4a5a30;
+      --olive-lit:  #6b8040;
+      --border:     #252820;
+      --border-lit: #3a3e30;
+      --scan:       rgba(0,255,60,0.018);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-size: 16px;
+      line-height: 1.75;
+      min-height: 100vh;
+      cursor: default;
+    }
+
+    /* ── GRAIN + SCANLINES ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 900;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          var(--scan) 2px,
+          var(--scan) 4px
+        );
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 901;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+      opacity: 1;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; animation: flicker-in 0.4s ease; }
+    @keyframes flicker-in {
+      0%   { opacity: 0; }
+      20%  { opacity: 0.6; }
+      40%  { opacity: 0.2; }
+      60%  { opacity: 0.9; }
+      100% { opacity: 1; }
+    }
+
+    /* ── EMERGENCY TICKER ── */
+    .ticker {
+      background: var(--blood);
+      padding: 0.35rem 0;
+      overflow: hidden;
+      border-bottom: 1px solid #5a0a0a;
+      position: relative;
+      z-index: 50;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 4rem;
+      animation: ticker-scroll 28s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-inner span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: #ffcccc;
+    }
+    .ticker-sep { color: rgba(255,200,200,0.4); }
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,10,6,0.96);
+      border-bottom: 1px solid var(--blood);
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      display: flex; align-items: center; justify-content: space-between;
+      height: 58px;
+      backdrop-filter: blur(6px);
+    }
+
+    .nav-logo {
+      font-family: 'Special Elite', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+    .nav-logo .blink-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--blood-lit);
+      animation: blink 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
+
+    .nav-logo span { color: var(--blood-lit); }
+
+    nav ul { display: flex; gap: 2rem; list-style: none; }
+    nav ul li button {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); background: none; border: none;
+      cursor: pointer; transition: color 0.2s;
+      padding: 0.3rem 0;
+    }
+    nav ul li button:hover { color: var(--blood-lit); }
+
+    /* ── SETUP BANNER ── */
+    .setup-banner {
+      background: #1a0e00; border-bottom: 1px solid var(--amber);
+      padding: 1rem clamp(1.5rem, 5vw, 4rem);
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .setup-banner-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em; color: var(--amber); flex: 1;
+    }
+    .setup-banner a {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--amber); border: 1px solid var(--amber);
+      padding: 0.4rem 0.9rem; text-decoration: none; transition: all 0.2s; white-space: nowrap;
+    }
+    .setup-banner a:hover { background: var(--amber); color: var(--bg); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: clamp(3rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+
+    /* distressed corner marks */
+    .hero::before, .hero::after {
+      content: '';
+      position: absolute;
+      width: 60px; height: 60px;
+      border-color: var(--blood);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .hero::before { top: 1.5rem; left: 1.5rem; border-width: 2px 0 0 2px; }
+    .hero::after  { bottom: 1.5rem; right: 1.5rem; border-width: 0 2px 2px 0; }
+
+    .hero-grid { display: grid; grid-template-columns: 1fr 380px; gap: 4rem; align-items: center; }
+
+    .hero-stamp {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--blood-lit); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .hero-stamp::before {
+      content: '▶';
+      font-size: 0.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Special Elite', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .hero-title .scratch {
+      display: block;
+      color: var(--blood-lit);
+      text-shadow: 2px 0 0 rgba(139,26,26,0.4), -1px 0 0 rgba(0,255,60,0.08);
+      position: relative;
+    }
+    .hero-title .scratch::after {
+      content: attr(data-text);
+      position: absolute; left: 2px; top: 0;
+      color: rgba(0,255,60,0.06);
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+    }
+
+    .hero-bio {
+      font-size: 0.95rem; color: var(--text-dim);
+      max-width: 480px; line-height: 1.9;
+      border-left: 2px solid var(--border-lit); padding-left: 1.2rem;
+    }
+
+    /* right panel */
+    .hero-panel {
+      border: 1px solid var(--border-lit);
+      background: var(--bg-2);
+      padding: 1.5rem;
+      position: relative;
+    }
+    .hero-panel::before {
+      content: 'ESTADO DEL SISTEMA';
+      position: absolute; top: -0.6rem; left: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      background: var(--bg-2); padding: 0 0.5rem; color: var(--text-dim);
+    }
+
+    .sys-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+    }
+    .sys-row:last-child { border-bottom: none; }
+    .sys-label { color: var(--text-dim); letter-spacing: 0.1em; }
+    .sys-val { color: var(--text); letter-spacing: 0.08em; }
+    .sys-val.good { color: var(--olive-lit); }
+    .sys-val.warn { color: var(--amber); }
+    .sys-val.danger { color: var(--blood-lit); animation: blink 2s infinite; }
+
+    .day-counter {
+      margin-top: 1.2rem;
+      padding: 1rem;
+      border: 1px solid var(--blood);
+      background: rgba(139,26,26,0.06);
+      text-align: center;
+    }
+    .day-num {
+      font-family: 'Special Elite', serif;
+      font-size: 2.8rem;
+      color: var(--blood-lit);
+      line-height: 1;
+      display: block;
+    }
+    .day-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); margin-top: 0.3rem; display: block;
+    }
+
+    /* ── MAIN ── */
+    .main-container { padding: 3rem clamp(1.5rem, 5vw, 4rem); }
+
+    .section-header {
+      display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem;
+    }
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--blood-lit); white-space: nowrap;
+    }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+    .section-count {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-faint);
+    }
+
+    /* ── POSTS GRID ── */
+    .posts-grid {
+      display: grid; grid-template-columns: 2fr 1fr;
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 3rem;
+    }
+
+    .post-card {
+      background: var(--bg-2); padding: 1.8rem;
+      cursor: pointer; transition: background 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .post-card:hover { background: var(--bg-3); }
+
+    .post-card.featured {
+      grid-row: 1 / 3; padding: 2.5rem;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      min-height: 400px; background: var(--bg-3);
+      border-right: 1px solid var(--blood);
+    }
+
+    /* caution stripe on featured */
+    .post-card.featured::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--blood) 0px, var(--blood) 20px,
+        transparent 20px, transparent 30px
+      );
+    }
+
+    .featured-tag {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      background: var(--blood); color: #ffcccc;
+      padding: 0.25rem 0.6rem; border-radius: 1px;
+    }
+
+    .post-transmission {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--blood-lit); margin-bottom: 0.7rem;
+    }
+
+    .post-title {
+      font-family: 'Special Elite', serif;
+      font-size: 1.2rem; color: var(--text); line-height: 1.3;
+      margin-bottom: 0.8rem;
+    }
+    .post-card.featured .post-title { font-size: 1.9rem; margin-bottom: 1rem; }
+
+    .post-excerpt {
+      font-size: 0.88rem; color: var(--text-dim);
+      line-height: 1.75; margin-bottom: 1.2rem;
+      font-style: italic;
+    }
+
+    .post-meta {
+      display: flex; align-items: center; gap: 1rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; color: var(--text-faint);
+      border-top: 1px solid var(--border); padding-top: 1rem;
+    }
+    .post-meta span + span::before { content: '//  '; }
+
+    /* ── LOADING ── */
+    .loading-state {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 3rem; color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+    }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border-lit); border-top-color: var(--blood-lit);
+      border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── LIST ── */
+    .posts-list { display: flex; flex-direction: column; }
+    .post-list-item {
+      display: grid; grid-template-columns: 3rem 1fr auto;
+      gap: 1.5rem; align-items: start;
+      padding: 1.4rem 0; border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .post-list-item:hover .post-list-title { color: var(--blood-lit); }
+
+    .post-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; color: var(--blood); letter-spacing: 0.1em;
+      padding-top: 0.3rem; text-align: right;
+    }
+    .post-list-title {
+      font-family: 'Special Elite', serif;
+      font-size: 1rem; color: var(--text); line-height: 1.35;
+      margin-bottom: 0.35rem; transition: color 0.2s;
+    }
+    .post-list-excerpt { font-size: 0.82rem; color: var(--text-dim); font-style: italic; }
+    .post-list-date {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.08em; color: var(--text-faint);
+      white-space: nowrap; padding-top: 0.4rem;
+    }
+
+    /* ── POST DETAIL ── */
+    .post-detail-container {
+      max-width: 720px; margin: 0 auto;
+      padding: 3rem clamp(1.5rem, 5vw, 2rem);
+    }
+
+    .back-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-dim); background: none; border: none;
+      cursor: pointer; display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 2.5rem; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--blood-lit); }
+
+    .detail-transmission {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.25em; color: var(--blood-lit);
+      margin-bottom: 1rem;
+    }
+    .detail-title {
+      font-family: 'Special Elite', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem); color: var(--text);
+      line-height: 1.15; margin-bottom: 1.5rem;
+    }
+    .detail-meta {
+      display: flex; gap: 2rem; flex-wrap: wrap;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em; color: var(--text-dim);
+      padding: 1rem 0; margin-bottom: 2rem;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--blood);
+    }
+    .detail-body { font-size: 1rem; line-height: 1.95; color: var(--text-dim); }
+    .detail-body p { margin-bottom: 1.5rem; }
+    .detail-body em { font-style: italic; color: var(--text); }
+    .detail-body blockquote {
+      border-left: 2px solid var(--blood);
+      padding: 0.5rem 0 0.5rem 1.5rem;
+      margin: 2rem 0;
+      font-style: italic; color: var(--text);
+      background: rgba(139,26,26,0.05);
+    }
+
+    /* ── ABOUT ── */
+    .about-container { max-width: 800px; margin: 0 auto; padding: 3rem clamp(1.5rem, 5vw, 2rem); }
+    .about-grid { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; align-items: start; }
+
+    .about-portrait {
+      width: 200px; height: 200px;
+      border: 1px solid var(--border-lit);
+      background: var(--bg-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; color: var(--text-faint);
+      position: relative; flex-shrink: 0;
+    }
+    .about-portrait::before, .about-portrait::after {
+      content: ''; position: absolute;
+      width: 30px; height: 30px; border-color: var(--blood); border-style: solid; opacity: 0.6;
+    }
+    .about-portrait::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .about-portrait::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .about-title { font-family: 'Special Elite', serif; font-size: 2.2rem; color: var(--text); margin-bottom: 0.5rem; }
+    .about-subtitle {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--blood-lit); margin-bottom: 1.5rem;
+    }
+    .about-text { color: var(--text-dim); margin-bottom: 1rem; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .about-tag {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      border: 1px solid var(--border-lit); padding: 0.3rem 0.8rem;
+      color: var(--text-dim); background: var(--bg-2);
+    }
+
+    /* ── EDITOR ── */
+    .editor-container { max-width: 760px; margin: 0 auto; padding: 3rem clamp(1.5rem, 5vw, 2rem); }
+    .field-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 0.5rem; display: block;
+    }
+    .field-group { margin-bottom: 1.5rem; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    input[type="text"], select, textarea {
+      width: 100%; background: var(--bg-2);
+      border: none; border-bottom: 1px solid var(--border-lit);
+      padding: 0.7rem 0.5rem;
+      font-family: 'Courier Prime', monospace; font-size: 0.95rem;
+      color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--blood-lit); }
+    select option { background: var(--bg-2); }
+
+    .title-input {
+      font-family: 'Special Elite', serif; font-size: 1.8rem;
+      border-bottom: 1px solid var(--blood); background: transparent; padding-left: 0;
+    }
+    textarea {
+      resize: vertical; min-height: 340px;
+      border: 1px solid var(--border-lit); padding: 1rem;
+      line-height: 1.85; background: var(--bg-2);
+    }
+    textarea:focus { border-color: var(--blood-lit); }
+
+    /* ── DB STATUS ── */
+    .db-status {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+      padding: 0.35rem 0.8rem; border: 1px solid var(--border);
+    }
+    .db-status.connected  { color: var(--olive-lit); border-color: var(--olive); }
+    .db-status.disconnected { color: var(--blood-lit); border-color: var(--blood); }
+    .db-status.checking { color: var(--text-dim); }
+    .db-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .connected .db-dot   { background: var(--olive-lit); animation: blink 2s infinite; }
+    .disconnected .db-dot { background: var(--blood-lit); }
+    .checking .db-dot    { background: var(--text-dim); }
+
+    /* ── BUTTONS ── */
+    .editor-actions { display: flex; gap: 1rem; margin-top: 1.5rem; align-items: center; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--blood); color: #ffcccc; border: none;
+      padding: 0.75rem 2rem; font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--blood-lit); }
+    .btn-primary:disabled { background: var(--bg-3); color: var(--text-faint); cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent; color: var(--text-dim);
+      border: 1px solid var(--border-lit);
+      padding: 0.75rem 2rem; font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--bg-3); color: var(--text);
+      border: 1px solid var(--border-lit);
+      border-left: 3px solid var(--olive-lit);
+      padding: 1rem 1.5rem; font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em;
+      z-index: 9999; transform: translateY(130%); transition: transform 0.3s ease;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); }
+    .toast.error { border-left-color: var(--blood-lit); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem clamp(1.5rem, 5vw, 4rem);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; color: var(--text-faint);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-panel { display: none; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .post-card.featured { grid-row: auto; min-height: 260px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-portrait { width: 100px; height: 100px; font-size: 3rem; }
+      .field-row { grid-template-columns: 1fr; }
+      nav ul { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>⚠ TRANSMISIÓN DE EMERGENCIA ACTIVA</span>
+    <span class="ticker-sep">///</span>
+    <span>ZONA DE CUARENTENA — ACCESO RESTRINGIDO</span>
+    <span class="ticker-sep">///</span>
+    <span>ÚLTIMA SEÑAL REGISTRADA: SECTOR 7</span>
+    <span class="ticker-sep">///</span>
+    <span>NO SALGAS DE NOCHE</span>
+    <span class="ticker-sep">///</span>
+    <span>⚠ TRANSMISIÓN DE EMERGENCIA ACTIVA</span>
+    <span class="ticker-sep">///</span>
+    <span>ZONA DE CUARENTENA — ACCESO RESTRINGIDO</span>
+    <span class="ticker-sep">///</span>
+    <span>ÚLTIMA SEÑAL REGISTRADA: SECTOR 7</span>
+    <span class="ticker-sep">///</span>
+    <span>NO SALGAS DE NOCHE</span>
+    <span class="ticker-sep">///</span>
+  </div>
+</div>
+
+<!-- SETUP BANNER -->
+<div class="setup-banner" id="setup-banner" style="display:none">
+  <div class="setup-banner-text">
+    ⚠ BASE DE DATOS NO CONFIGURADA — Los registros solo se guardan en este terminal.
+    Edita el archivo e introduce tu URL y clave de Supabase.
+  </div>
+  <a href="https://supabase.com" target="_blank">Ir a Supabase →</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showView('home')">
+    <div class="blink-dot"></div>
+    ARCHIVO <span>PERDIDO</span>
+  </div>
+  <ul>
+    <li><button onclick="showView('home')">// Registros</button></li>
+    <li><button onclick="showView('write')">// Nuevo registro</button></li>
+    <li><button onclick="showView('about')">// Superviviente</button></li>
+  </ul>
+</nav>
+
+<!-- HOME -->
+<div id="view-home" class="view active">
+
+  <div class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="hero-stamp">Transmisión activa — Señal débil pero estable</div>
+        <h1 class="hero-title">
+          Escritos<br>
+          desde el<br>
+          <span class="scratch" data-text="fin del mundo">fin del mundo</span>
+        </h1>
+        <p class="hero-bio">
+          Una novela post-apocalíptica. Los infectados llegaron un martes. Lo que quedó
+          después no tiene nombre todavía. Estos registros son lo único que prueba que
+          alguien sobrevivió para contarlo.
+        </p>
+      </div>
+
+      <div class="hero-panel">
+        <div class="sys-row"><span class="sys-label">ESTADO SEÑAL</span><span class="sys-val good">ACTIVA</span></div>
+        <div class="sys-row"><span class="sys-label">ZONA</span><span class="sys-val">CUARENTENA-7</span></div>
+        <div class="sys-row"><span class="sys-label">TEMPERATURA</span><span class="sys-val warn">38.4°C</span></div>
+        <div class="sys-row"><span class="sys-label">PERÍMETRO</span><span class="sys-val danger">COMPROMETIDO</span></div>
+        <div class="sys-row"><span class="sys-label">REGISTROS</span><span class="sys-val" id="stat-posts">—</span></div>
+        <div class="sys-row"><span class="sys-label">SUPERVIVIENTES</span><span class="sys-val warn">DESCONOCIDO</span></div>
+        <div class="day-counter">
+          <span class="day-num" id="day-counter">—</span>
+          <span class="day-label">Días desde el colapso</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="section-header">
+      <span class="section-label">// Últimas transmisiones</span>
+      <div class="section-line"></div>
+      <span class="section-count" id="grid-count"></span>
+    </div>
+    <div class="posts-grid" id="posts-grid">
+      <div class="loading-state" style="grid-column:1/-1">
+        <div class="spinner"></div> Recuperando señal…
+      </div>
+    </div>
+
+    <div class="section-header" style="margin-top:3rem">
+      <span class="section-label">// Archivo completo</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="posts-list" id="posts-list">
+      <div class="loading-state"><div class="spinner"></div> Cargando archivo…</div>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL -->
+<div id="view-post" class="view">
+  <div class="post-detail-container">
+    <button class="back-btn" onclick="showView('home')">◀ Volver al archivo</button>
+    <div class="detail-transmission" id="detail-transmission"></div>
+    <h1 class="detail-title" id="detail-title"></h1>
+    <div class="detail-meta">
+      <span id="detail-date"></span>
+      <span id="detail-read"></span>
+      <span id="detail-cat"></span>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- WRITE -->
+<div id="view-write" class="view">
+  <div class="editor-container">
+    <div class="section-header">
+      <span class="section-label">// Nuevo registro de campo</span>
+      <div class="section-line"></div>
+      <div class="db-status checking" id="db-status">
+        <div class="db-dot"></div><span id="db-status-text">Verificando…</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Título del registro</label>
+      <input type="text" class="title-input" id="new-title" placeholder="Nombre de la entrada…" />
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Clasificación</label>
+        <select id="new-category">
+          <option value="Crónica">Crónica</option>
+          <option value="Supervivencia">Supervivencia</option>
+          <option value="Personajes">Personajes</option>
+          <option value="El Mundo Antes">El Mundo Antes</option>
+          <option value="Transmisión">Transmisión</option>
+          <option value="Encuentros">Encuentros</option>
+          <option value="Diario">Diario</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Extracto (opcional)</label>
+        <input type="text" id="new-excerpt" placeholder="Una frase del registro…" />
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Contenido del registro</label>
+      <textarea id="new-body" placeholder="Escribe aquí tu entrada… Usa > al inicio de línea para citas y *asteriscos* para énfasis."></textarea>
+    </div>
+    <div class="editor-actions">
+      <button class="btn-primary" id="publish-btn" onclick="publishPost()">▶ Transmitir registro</button>
+      <button class="btn-secondary" onclick="showView('home')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="view-about" class="view">
+  <div class="about-container">
+    <div class="section-header">
+      <span class="section-label">// Ficha del superviviente</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-portrait">☠</div>
+      <div>
+        <h2 class="about-title">Sigo aquí.</h2>
+        <div class="about-subtitle">Narrador · Escritor · Último en saberlo</div>
+        <p class="about-text">
+          Empecé a escribir esta historia mucho antes de que el mundo se rompiera. Ahora no sé si es ficción o un manual de instrucciones. La novela sigue creciendo, y yo también.
+        </p>
+        <p class="about-text">
+          Este archivo es el lugar donde guardo los capítulos, los fragmentos sueltos, las escenas que no sé dónde meter todavía. Si estás leyendo esto, gracias por acompañarme en el fin del mundo.
+        </p>
+        <div class="about-tags">
+          <span class="about-tag">Post-apocalipsis</span>
+          <span class="about-tag">Zombis</span>
+          <span class="about-tag">Supervivencia</span>
+          <span class="about-tag">Mundo abierto</span>
+          <span class="about-tag">Ficción oscura</span>
+          <span class="about-tag">Escritura creativa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>ARCHIVO PERDIDO — SEÑAL ACTIVA DESDE EL COLAPSO</span>
+  <span id="footer-db">ALMACENAMIENTO: LOCAL</span>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CONTADOR DE DÍAS DESDE UN APOCALIPSIS FICTICIO (1 Ene 2023) ──
+  const COLLAPSE_DATE = new Date('2023-01-01');
+  const daysSince = Math.floor((new Date() - COLLAPSE_DATE) / 86400000);
+  document.getElementById('day-counter').textContent = daysSince.toLocaleString('es-ES');
+
+  // ── SUPABASE ──
+  const isConfigured = SUPABASE_URL !== 'PEGA_TU_URL_AQUI' && SUPABASE_KEY !== 'PEGA_TU_CLAVE_ANON_AQUI';
+  let db = null;
+  let usingCloud = false;
+
+  if (isConfigured) {
+    try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
+  } else {
+    document.getElementById('setup-banner').style.display = 'flex';
+  }
+
+  // ── POSTS FALLBACK ──
+  const FALLBACK_POSTS = [
+    {
+      id: 1, category: "Crónica",
+      title: "El martes que cambió todo",
+      excerpt: "Nadie lo vio venir. O quizás sí, y simplemente eligieron no mirar.",
+      date: "Día 12 del colapso",
+      read_time: "5 min",
+      body: `Fue un martes. Siempre son los martes. Hay algo en ese día de la semana que nunca termina de encontrar su sitio, como si el universo lo hubiera puesto ahí solo para que las catástrofes tuvieran un hogar.\n\nLo primero que vi fue a un hombre en la esquina del mercado. Estaba de rodillas, con la camisa desgarrada, mordiéndose el antebrazo con una concentración que me pareció casi artística. No gritaba. Ese fue el detalle más aterrador: *no gritaba*.\n\n> "El silencio es la primera señal. Aprende a escucharlo antes de que sea tarde."\n\nCuando llegué a casa, la televisión ya emitía el aviso de emergencia. No dijeron zombis. Nunca dicen zombis. Dijeron "brote de comportamiento agresivo no filiado". Como si ponerle nombre burocrático fuera a cambiar lo que estaba pasando fuera.\n\nCerré las ventanas. Llené la bañera de agua. Busqué las linternas.\n\nLlevaba años leyendo sobre el fin del mundo. Resultó que sabía exactamente qué hacer. Lo que no sabía era que iba a tener que hacerlo de verdad.`
+    },
+    {
+      id: 2, category: "Personajes",
+      title: "Elena no habla, pero escucha todo",
+      excerpt: "Llegó al refugio sin nombre, sin pasado y con las manos llenas de cicatrices.",
+      date: "Día 34 del colapso",
+      read_time: "4 min",
+      body: `No sé cuántos años tiene. Treinta, quizás. Quizás menos. El hambre te envejece de formas que el tiempo no puede.\n\nLlegó al refugio un jueves por la tarde, cuando el sol ya caía sobre las ruinas del supermercado y la luz tenía ese color de yema de huevo podrida que tan bien hemos aprendido a odiar. Llamó a la puerta tres veces, exactamente tres, y esperó.\n\n*Eso ya me dijo todo lo que necesitaba saber sobre ella.*\n\nLos que llegan desesperados golpean sin parar. Los que llegan con miedo, apenas rozan la madera. Elena golpeó tres veces y esperó. Alguien que sabe esperar es alguien que ha aprendido a sobrevivir.\n\n> "No te fíes de quien habla demasiado. En el nuevo mundo, las palabras son un lujo que pocos pueden permitirse."\n\nNunca nos contó de dónde venía. Nosotros tampoco preguntamos. Hay un acuerdo tácito entre supervivientes: el pasado no alimenta, no calienta y no mata infectados. El presente sí.`
+    },
+    {
+      id: 3, category: "El Mundo Antes",
+      title: "Cosas que ya no existen: una lista incompleta",
+      excerpt: "El café caliente. El ruido del tráfico. La luz de las farolas. Los lunes que odiábamos.",
+      date: "Día 67 del colapso",
+      read_time: "3 min",
+      body: `Empecé esta lista para no olvidar. Ahora ya no sé si olvidar sería lo más compasivo.\n\nEl olor a pan recién horneado a las siete de la mañana. La notificación del móvil. El sonido de un partido de fútbol viniendo del piso de arriba. Las discusiones sobre si hace frío o calor en la oficina.\n\n*El aburrimiento. Dios mío, cuánto echo de menos el aburrimiento.*\n\nEchar de menos cosas pequeñas es lo que te rompe. No la violencia, no el miedo. Es recordar que una vez tuviste una vida tan llena de pequeñeces que te quejabas de ellas.\n\n> "El apocalipsis no te quita el futuro. Te quita el pasado. Te hace darle cuenta de todo lo que no valoraste mientras lo tenías."\n\nLa lista sigue creciendo cada noche, cuando no puedo dormir y el sonido de los infectados en la calle se vuelve casi familiar. Lo escribo todo. Para recordar. Para no olvidar quiénes éramos antes de convertirnos en esto.`
+    }
+  ];
+
+  let localPosts = JSON.parse(localStorage.getItem('apoc_blog_v1') || 'null') || FALLBACK_POSTS;
+  function saveLocal(p) { localStorage.setItem('apoc_blog_v1', JSON.stringify(p)); }
+
+  // ── VIEWS ──
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    if (name === 'home') loadAndRenderHome();
+    if (name === 'write') updateDbStatus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── DB STATUS ──
+  async function updateDbStatus() {
+    const el = document.getElementById('db-status');
+    const txt = document.getElementById('db-status-text');
+    if (!isConfigured || !db) {
+      el.className = 'db-status disconnected';
+      txt.textContent = 'Sin base de datos — almacenando localmente';
+      return;
+    }
+    try {
+      const { error } = await db.from('posts').select('id').limit(1);
+      if (error) throw error;
+      el.className = 'db-status connected';
+      txt.textContent = 'Supabase conectado — transmisión activa';
+      usingCloud = true;
+      document.getElementById('footer-db').textContent = 'ALMACENAMIENTO: NUBE ☁';
+    } catch(e) {
+      el.className = 'db-status disconnected';
+      txt.textContent = 'Error de conexión — almacenando localmente';
+    }
+  }
+
+  // ── LOAD ──
+  async function loadPosts() {
+    if (!isConfigured || !db) return localPosts;
+    try {
+      const { data, error } = await db.from('posts').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      usingCloud = true;
+      document.getElementById('footer-db').textContent = 'ALMACENAMIENTO: NUBE ☁';
+      return data || [];
+    } catch(e) {
+      return localPosts;
+    }
+  }
+
+  // ── RENDER HOME ──
+  async function loadAndRenderHome() {
+    const posts = await loadPosts();
+    document.getElementById('stat-posts').textContent = posts.length;
+    renderGrid(posts);
+    renderList(posts);
+  }
+
+  function txId(index) {
+    return 'TX-' + String(index + 1).padStart(4, '0');
+  }
+
+  function renderGrid(posts) {
+    const grid = document.getElementById('posts-grid');
+    const latest = posts.slice(0, 3);
+    document.getElementById('grid-count').textContent = latest.length + ' registros recientes';
+    grid.innerHTML = '';
+
+    if (latest.length === 0) {
+      grid.innerHTML = '<div class="loading-state" style="grid-column:1/-1;font-style:italic">Sin registros. Comienza tu primera transmisión.</div>';
+      return;
+    }
+
+    const f = latest[0];
+    const featured = document.createElement('div');
+    featured.className = 'post-card featured';
+    featured.onclick = () => openPost(f, posts.length - posts.indexOf(f) - 1);
+    featured.innerHTML = `
+      <div class="featured-tag">Última transmisión</div>
+      <div class="post-transmission">${txId(posts.indexOf(f))} — ${f.category}</div>
+      <div class="post-title">${f.title}</div>
+      <div class="post-excerpt">${f.excerpt || f.body.substring(0, 130) + '…'}</div>
+      <div class="post-meta"><span>${f.date}</span><span>${f.read_time || '3 min'} de lectura</span></div>`;
+    grid.appendChild(featured);
+
+    latest.slice(1, 3).forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.onclick = () => openPost(p, posts.length - posts.indexOf(p) - 1);
+      card.innerHTML = `
+        <div class="post-transmission">${txId(posts.indexOf(p))} — ${p.category}</div>
+        <div class="post-title">${p.title}</div>
+        <div class="post-excerpt">${p.excerpt || p.body.substring(0, 90) + '…'}</div>
+        <div class="post-meta"><span>${p.date}</span><span>${p.read_time || '3 min'}</span></div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderList(posts) {
+    const list = document.getElementById('posts-list');
+    list.innerHTML = '';
+    if (posts.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-dim);font-style:italic;padding:1rem 0">No hay registros en el archivo.</p>';
+      return;
+    }
+    posts.forEach((p, i) => {
+      const item = document.createElement('div');
+      item.className = 'post-list-item';
+      item.onclick = () => openPost(p, i);
+      item.innerHTML = `
+        <div class="post-num">${txId(i)}</div>
+        <div>
+          <div class="post-list-title">${p.title}</div>
+          <div class="post-list-excerpt">${p.excerpt || p.body.substring(0, 90) + '…'}</div>
+        </div>
+        <div class="post-list-date">${p.date}</div>`;
+      list.appendChild(item);
+    });
+  }
+
+  // ── OPEN POST ──
+  function openPost(post, index) {
+    document.getElementById('detail-transmission').textContent = txId(index || 0) + ' — TRANSMISIÓN REGISTRADA';
+    document.getElementById('detail-title').textContent = post.title;
+    document.getElementById('detail-date').textContent = post.date;
+    document.getElementById('detail-read').textContent = (post.read_time || '3 min') + ' de lectura';
+    document.getElementById('detail-cat').textContent = post.category;
+    document.getElementById('detail-body').innerHTML = formatBody(post.body);
+    showView('post');
+  }
+
+  function formatBody(text) {
+    return text.split('\n\n').map(p => {
+      if (p.startsWith('> ')) return `<blockquote>${p.slice(2)}</blockquote>`;
+      return `<p>${p.replace(/\*(.+?)\*/g, '<em>$1</em>')}</p>`;
+    }).join('');
+  }
+
+  // ── PUBLISH ──
+  async function publishPost() {
+    const title    = document.getElementById('new-title').value.trim();
+    const category = document.getElementById('new-category').value;
+    const excerpt  = document.getElementById('new-excerpt').value.trim();
+    const body     = document.getElementById('new-body').value.trim();
+
+    if (!title || !body) { showToast('ERROR // Título y contenido son obligatorios', false); return; }
+
+    const wordCount = body.split(/\s+/).length;
+    const read_time = Math.max(1, Math.round(wordCount / 220)) + ' min';
+    const now = new Date();
+    const daysSinceCollapse = Math.floor((now - COLLAPSE_DATE) / 86400000);
+    const date = `Día ${daysSinceCollapse} del colapso`;
+
+    const btn = document.getElementById('publish-btn');
+    btn.disabled = true; btn.textContent = '▶ Transmitiendo…';
+
+    const newPost = { title, category, excerpt, body, date, read_time };
+    let savedToCloud = false;
+
+    if (isConfigured && db) {
+      try {
+        const { error } = await db.from('posts').insert([newPost]);
+        if (error) throw error;
+        savedToCloud = true;
+      } catch(e) { console.warn('Fallback local:', e.message); }
+    }
+
+    if (!savedToCloud) {
+      const maxId = localPosts.reduce((m, p) => Math.max(m, p.id || 0), 0);
+      localPosts.unshift({ ...newPost, id: maxId + 1 });
+      saveLocal(localPosts);
+    }
+
+    ['new-title','new-excerpt','new-body'].forEach(id => document.getElementById(id).value = '');
+    btn.disabled = false; btn.textContent = '▶ Transmitir registro';
+    showToast(savedToCloud ? '// Registro transmitido a la nube' : '// Registro guardado localmente');
+    showView('home');
+  }
+
+  // ── TOAST ──
+  function showToast(msg, ok = true) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (ok ? '' : ' error');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // ── INIT ──
+  loadAndRenderHome();
+  updateDbStatus();
+</script>
+</body>
+</html>
