@@ -10,8 +10,14 @@
        PEGA TU URL Y CLAVE ANÓNIMA DE SUPABASE AQUÍ
        ═══════════════════════════════════════════════════════ -->
   <script>
-    const SUPABASE_URL = 'https://uctpviyfuhepxrjcoors.supabase.co/rest/v1/';
+    const SUPABASE_URL = 'https://uctpviyfuhepxrjcoors.supabase.co'; // ← sin /rest/v1/
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjdHB2aXlmdWhlcHhyamNvb3JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDk1MzIsImV4cCI6MjA5MzYyNTUzMn0.unB5yvBRT6urlUKl8Gv_rkhXRa6rmD6Gjm8soxr4BaQ';
+
+    // ═══════════════════════════════════════════════════════
+    // CONTRASEÑA DE ACCESO AL EDITOR
+    // Cambia "mi-contrasena-secreta" por la que quieras.
+    // ═══════════════════════════════════════════════════════
+    const ADMIN_PASSWORD = '6239021umbefa';
   </script>
   <!-- ═══════════════════════════════════════════════════════ -->
 
@@ -570,6 +576,133 @@
       .field-row { grid-template-columns: 1fr; }
       nav ul { gap: 1rem; }
     }
+
+    /* ── LOGIN TERMINAL ── */
+    #view-login {
+      min-height: calc(100vh - 120px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    #view-login.active {
+      display: flex;
+      animation: flicker-in 0.5s ease;
+    }
+
+    .terminal-box {
+      width: 100%;
+      max-width: 520px;
+      border: 1px solid var(--blood);
+      background: var(--bg-2);
+      position: relative;
+    }
+
+    .terminal-box::before,
+    .terminal-box::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: var(--blood-lit); border-style: solid; opacity: 0.7;
+    }
+    .terminal-box::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .terminal-box::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .terminal-titlebar {
+      background: var(--blood);
+      padding: 0.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .terminal-titlebar-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #ffcccc;
+    }
+    .terminal-dots { display: flex; gap: 0.4rem; }
+    .terminal-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,200,200,0.3);
+    }
+
+    .terminal-body { padding: 2rem; }
+
+    .terminal-log {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.05em;
+      color: var(--text-dim); line-height: 2;
+      margin-bottom: 1.8rem;
+      border-left: 1px solid var(--border-lit); padding-left: 1rem;
+    }
+    .terminal-log .log-line { display: block; }
+    .terminal-log .log-ok   { color: var(--olive-lit); }
+    .terminal-log .log-warn { color: var(--amber); }
+    .terminal-log .log-err  { color: var(--blood-lit); }
+
+    .terminal-prompt {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--blood-lit); margin-bottom: 0.6rem; display: block;
+    }
+
+    .terminal-input-row {
+      display: flex; align-items: center; gap: 0.7rem;
+      border: 1px solid var(--border-lit);
+      background: var(--bg); padding: 0.6rem 0.9rem;
+      margin-bottom: 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .terminal-input-row:focus-within { border-color: var(--blood-lit); }
+    .terminal-caret {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem; color: var(--blood-lit);
+      animation: blink 1s step-end infinite; flex-shrink: 0;
+    }
+    .terminal-input-row input {
+      flex: 1; background: transparent; border: none;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.88rem;
+      color: var(--text); outline: none; letter-spacing: 0.1em;
+    }
+
+    .terminal-error {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; color: var(--blood-lit);
+      min-height: 1.2rem; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .terminal-actions { display: flex; gap: 0.8rem; align-items: center; }
+
+    .btn-terminal {
+      background: var(--blood); color: #ffcccc; border: none;
+      padding: 0.65rem 1.8rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .btn-terminal:hover { background: var(--blood-lit); }
+    .btn-terminal:disabled { background: var(--bg-3); color: var(--text-faint); cursor: not-allowed; }
+
+    .btn-terminal-ghost {
+      background: transparent; color: var(--text-dim); border: 1px solid var(--border-lit);
+      padding: 0.65rem 1.2rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-terminal-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+    /* auth badge in nav */
+    .auth-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; color: var(--olive-lit);
+      background: rgba(75,90,48,0.15); border: 1px solid var(--olive);
+      padding: 0.2rem 0.6rem; border-radius: 1px;
+    }
+    .auth-badge-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--olive-lit); animation: blink 2s infinite;
+    }
   </style>
 </head>
 <body>
@@ -613,8 +746,14 @@
   </div>
   <ul>
     <li><button onclick="showView('home')">// Registros</button></li>
-    <li><button onclick="showView('write')">// Nuevo registro</button></li>
+    <li><button onclick="requireAuth()">// Nuevo registro</button></li>
     <li><button onclick="showView('about')">// Superviviente</button></li>
+    <li id="nav-auth-badge" style="display:none">
+      <span class="auth-badge"><span class="auth-badge-dot"></span>ACCESO ACTIVO</span>
+    </li>
+    <li id="nav-logout-btn" style="display:none">
+      <button onclick="logout()">// Cerrar sesión</button>
+    </li>
   </ul>
 </nav>
 
@@ -686,6 +825,51 @@
       <span id="detail-cat"></span>
     </div>
     <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- LOGIN TERMINAL -->
+<div id="view-login" class="view">
+  <div class="terminal-box">
+    <div class="terminal-titlebar">
+      <span class="terminal-titlebar-text">⚠ ZONA RESTRINGIDA — AUTENTICACIÓN REQUERIDA</span>
+      <div class="terminal-dots">
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+      </div>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-log">
+        <span class="log-line log-ok">► SISTEMA ACTIVO ........... OK</span>
+        <span class="log-line log-ok">► CONEXIÓN SEGURA .......... OK</span>
+        <span class="log-line log-warn">► ACCESO AL EDITOR ......... RESTRINGIDO</span>
+        <span class="log-line log-err">► IDENTIFICACIÓN REQUERIDA . PENDIENTE</span>
+      </div>
+
+      <label class="terminal-prompt">INTRODUCE CÓDIGO DE ACCESO</label>
+      <div class="terminal-input-row">
+        <span class="terminal-caret">█</span>
+        <input
+          type="password"
+          id="login-password"
+          placeholder="••••••••••••"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter') attemptLogin()"
+        />
+      </div>
+
+      <div class="terminal-error" id="login-error"></div>
+
+      <div class="terminal-actions">
+        <button class="btn-terminal" id="login-btn" onclick="attemptLogin()">
+          ▶ VERIFICAR IDENTIDAD
+        </button>
+        <button class="btn-terminal-ghost" onclick="showView('home')">
+          Volver
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -778,7 +962,7 @@
   document.getElementById('day-counter').textContent = daysSince.toLocaleString('es-ES');
 
   // ── SUPABASE ──
-  const isConfigured = SUPABASE_URL !== 'https://uctpviyfuhepxrjcoors.supabase.co/rest/v1/' && SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjdHB2aXlmdWhlcHhyamNvb3JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDk1MzIsImV4cCI6MjA5MzYyNTUzMn0.unB5yvBRT6urlUKl8Gv_rkhXRa6rmD6Gjm8soxr4BaQ';
+  const isConfigured = SUPABASE_URL !== 'https://uctpviyfuhepxrjcoors.supabase.co' && SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjdHB2aXlmdWhlcHhyamNvb3JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDk1MzIsImV4cCI6MjA5MzYyNTUzMn0.unB5yvBRT6urlUKl8Gv_rkhXRa6rmD6Gjm8soxr4BaQ';
   let db = null;
   let usingCloud = false;
 
