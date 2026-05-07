@@ -834,9 +834,11 @@
       list.appendChild(el);
     });
   }
-
   // ── OPEN POST ──
+  let currentPostId = null;
+
   function openPost(post, idx) {
+    currentPostId = String(post.id);
     document.getElementById('detail-tx').textContent    = txId(idx) + ' — TRANSMISIÓN REGISTRADA';
     document.getElementById('detail-title').textContent = post.title;
     document.getElementById('detail-date').textContent  = post.date;
@@ -844,6 +846,7 @@
     document.getElementById('detail-cat').textContent   = post.category;
     document.getElementById('detail-body').innerHTML    = formatBody(post.body);
     showView('post');
+    loadComments(currentPostId);
   }
 
   function formatBody(text) {
@@ -884,7 +887,8 @@
     showToast(cloud ? '// Registro transmitido a la nube' : '// Registro guardado localmente');
     showView('home');
   }
- // ── COMMENTS ──
+
+  // ── COMMENTS ──
   const localComments = JSON.parse(localStorage.getItem('apoc_comments') || '{}');
   const saveLocalComments = () => localStorage.setItem('apoc_comments', JSON.stringify(localComments));
 
@@ -991,6 +995,7 @@
     showToast('// Transmisión recibida — gracias, ' + author);
     loadComments(currentPostId);
   }
+
   // ── TOAST ──
   function showToast(msg, ok = true) {
     const t = document.getElementById('toast');
