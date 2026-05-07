@@ -406,6 +406,105 @@
       font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; color: var(--text-faint);
     }
 
+    /* ── COMMENTS ── */
+    .comments-section {
+      max-width: 720px; margin: 0 auto;
+      padding: 0 clamp(1.5rem,5vw,2rem) 4rem;
+    }
+    .comments-header {
+      display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem;
+      border-top: 1px solid var(--border); padding-top: 2.5rem;
+    }
+    .comments-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.63rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--blood-lit); white-space: nowrap;
+    }
+    .comments-count {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.1em; color: var(--text-faint);
+    }
+
+    /* comment form */
+    .comment-form {
+      border: 1px solid var(--border-lit); background: var(--bg-2);
+      padding: 1.5rem; margin-bottom: 2.5rem; position: relative;
+    }
+    .comment-form::before {
+      content: 'ENVIAR TRANSMISIÓN';
+      position: absolute; top: -0.6rem; left: 1rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; letter-spacing: 0.2em;
+      background: var(--bg-2); padding: 0 0.5rem; color: var(--text-dim);
+    }
+    .comment-name-row {
+      display: flex; align-items: center; gap: 0.7rem;
+      border-bottom: 1px solid var(--border-lit); margin-bottom: 1rem; padding-bottom: 0.3rem;
+    }
+    .comment-name-prefix {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; color: var(--blood-lit); flex-shrink: 0;
+    }
+    .comment-name-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.82rem;
+      color: var(--text); letter-spacing: 0.06em; padding: 0.3rem 0;
+    }
+    .comment-name-input::placeholder { color: var(--text-faint); }
+    .comment-body-input {
+      width: 100%; background: transparent; border: none; outline: none; resize: none;
+      font-family: 'Courier Prime', monospace; font-size: 0.92rem;
+      color: var(--text); line-height: 1.75; min-height: 90px; padding: 0.2rem 0;
+      border-bottom: 1px solid var(--border-lit); margin-bottom: 1rem;
+    }
+    .comment-body-input::placeholder { color: var(--text-faint); font-style: italic; }
+    .comment-form-footer {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;
+    }
+    .comment-hint {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; color: var(--text-faint); font-style: italic;
+    }
+    .btn-comment {
+      background: var(--blood); color: #ffcccc; border: none; padding: 0.55rem 1.5rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-comment:hover    { background: var(--blood-lit); }
+    .btn-comment:disabled { background: var(--bg-3); color: var(--text-faint); cursor: not-allowed; }
+
+    /* comment list */
+    .comments-list { display: flex; flex-direction: column; gap: 0; }
+    .comment-item {
+      padding: 1.3rem 0; border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: auto 1fr; gap: 1.2rem; align-items: start;
+      animation: flicker-in 0.3s ease;
+    }
+    .comment-avatar {
+      width: 32px; height: 32px; border: 1px solid var(--border-lit);
+      background: var(--bg-3); display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      color: var(--blood-lit); flex-shrink: 0; margin-top: 0.2rem;
+    }
+    .comment-author {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; color: var(--olive-lit); margin-bottom: 0.4rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .comment-date {
+      font-size: 0.58rem; color: var(--text-faint); letter-spacing: 0.06em;
+    }
+    .comment-body {
+      font-size: 0.92rem; color: var(--text-dim); line-height: 1.75;
+    }
+    .comments-empty {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.08em; color: var(--text-faint); font-style: italic;
+      padding: 1.5rem 0; text-align: center;
+    }
+    .comments-loading {
+      display: flex; align-items: center; gap: 0.8rem; padding: 1.5rem 0;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--text-dim);
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 800px) {
       .hero-grid     { grid-template-columns: 1fr; }
@@ -426,11 +525,11 @@
   <div class="ticker-inner">
     <span>⚠ TRANSMISIÓN DE EMERGENCIA ACTIVA</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
     <span>ZONA DE CUARENTENA — ACCESO RESTRINGIDO</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
-    <span>ÚLTIMA SEÑAL REGISTRADA: DESCONOCIDA</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
+    <span>ÚLTIMA SEÑAL REGISTRADA: SECTOR 7</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
     <span>NO SALGAS DE NOCHE</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
     <span>⚠ TRANSMISIÓN DE EMERGENCIA ACTIVA</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
     <span>ZONA DE CUARENTENA — ACCESO RESTRINGIDO</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
-    <span>ÚLTIMA SEÑAL REGISTRADA: DESCONOCIDA</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
+    <span>ÚLTIMA SEÑAL REGISTRADA: SECTOR 7</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
     <span>NO SALGAS DE NOCHE</span><span class="ticker-sep">&nbsp;///&nbsp;</span>
   </div>
 </div>
@@ -470,12 +569,12 @@
           Escritos<br>desde el<br>
           <span class="scratch">fin del mundo</span>
         </h1>
-        <p class="hero-bio">Una novela post-apocalíptica. Estos registros son lo único que prueba que alguien sobrevivió para contarlo.</p>
+        <p class="hero-bio">Una novela post-apocalíptica. Los infectados llegaron un martes. Lo que quedó después no tiene nombre todavía. Estos registros son lo único que prueba que alguien sobrevivió para contarlo.</p>
       </div>
       <div class="hero-panel">
         <div class="sys-row"><span class="sys-label">ESTADO SEÑAL</span><span class="sys-val good">ACTIVA</span></div>
         <div class="sys-row"><span class="sys-label">ZONA</span><span class="sys-val">CUARENTENA-7</span></div>
-        <div class="sys-row"><span class="sys-label">TEMPERATURA</span><span class="sys-val warn">8°C</span></div>
+        <div class="sys-row"><span class="sys-label">TEMPERATURA</span><span class="sys-val warn">38.4°C</span></div>
         <div class="sys-row"><span class="sys-label">PERÍMETRO</span><span class="sys-val danger">COMPROMETIDO</span></div>
         <div class="sys-row"><span class="sys-label">REGISTROS</span><span class="sys-val" id="stat-posts">—</span></div>
         <div class="sys-row"><span class="sys-label">SUPERVIVIENTES</span><span class="sys-val warn">DESCONOCIDO</span></div>
@@ -519,6 +618,36 @@
       <span id="detail-cat"></span>
     </div>
     <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- COMMENTS -->
+  <div class="comments-section">
+    <div class="comments-header">
+      <span class="comments-label">// Transmisiones de otros supervivientes</span>
+      <div class="section-line"></div>
+      <span class="comments-count" id="comments-count"></span>
+    </div>
+
+    <!-- form -->
+    <div class="comment-form">
+      <div class="comment-name-row">
+        <span class="comment-name-prefix">IDENTIFICACIÓN &gt;</span>
+        <input type="text" class="comment-name-input" id="comment-name"
+               placeholder="Tu nombre (opcional — si no, serás un superviviente anónimo)" maxlength="60" />
+      </div>
+      <textarea class="comment-body-input" id="comment-body"
+                placeholder="Escribe tu transmisión…" maxlength="1200"
+                onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)) submitComment()"></textarea>
+      <div class="comment-form-footer">
+        <span class="comment-hint">Ctrl+Enter para enviar</span>
+        <button class="btn-comment" id="comment-btn" onclick="submitComment()">▶ Enviar transmisión</button>
+      </div>
+    </div>
+
+    <!-- list -->
+    <div class="comments-list" id="comments-list">
+      <div class="comments-loading"><div class="spinner"></div>&nbsp;Recuperando transmisiones…</div>
+    </div>
   </div>
 </div>
 
@@ -627,7 +756,7 @@
 
 <script>
   // ── DÍAS DESDE EL COLAPSO ──
-  const COLLAPSE = new Date('2026-03-23');
+  const COLLAPSE = new Date('2023-01-01');
   const daysSince = Math.floor((Date.now() - COLLAPSE) / 86400000);
   document.getElementById('day-counter').textContent = daysSince.toLocaleString('es-ES');
 
@@ -737,28 +866,6 @@
     }
   }
 
-  // ── POSTS LOCALES (fallback) ──
-  const SAMPLES = [
-    { id:1, category:'Crónica', title:'El martes que cambió todo',
-      excerpt:'Nadie lo vio venir. O quizás sí, y simplemente eligieron no mirar.',
-      date:'Día 12 del colapso', read_time:'5 min',
-      body:`Fue un martes. Siempre son los martes. Hay algo en ese día de la semana que nunca termina de encontrar su sitio, como si el universo lo hubiera puesto ahí solo para que las catástrofes tuvieran un hogar.\n\nLo primero que vi fue a un hombre en la esquina del mercado. Estaba de rodillas, con la camisa desgarrada, mordiéndose el antebrazo con una concentración que me pareció casi artística. No gritaba. Ese fue el detalle más aterrador: *no gritaba*.\n\n> "El silencio es la primera señal. Aprende a escucharlo antes de que sea tarde."\n\nCuando llegué a casa, la televisión ya emitía el aviso de emergencia. No dijeron zombis. Nunca dicen zombis. Dijeron "brote de comportamiento agresivo no filiado".\n\nCerré las ventanas. Llené la bañera de agua. Busqué las linternas.\n\nLlevaba años leyendo sobre el fin del mundo. Resultó que sabía exactamente qué hacer. Lo que no sabía era que iba a tener que hacerlo de verdad.`
-    },
-    { id:2, category:'Personajes', title:'Elena no habla, pero escucha todo',
-      excerpt:'Llegó al refugio sin nombre, sin pasado y con las manos llenas de cicatrices.',
-      date:'Día 34 del colapso', read_time:'4 min',
-      body:`No sé cuántos años tiene. Treinta, quizás. Quizás menos. El hambre te envejece de formas que el tiempo no puede.\n\nLlegó al refugio un jueves por la tarde. Llamó a la puerta tres veces, exactamente tres, y esperó.\n\n*Eso ya me dijo todo lo que necesitaba saber sobre ella.*\n\nLos que llegan desesperados golpean sin parar. Los que llegan con miedo, apenas rozan la madera. Elena golpeó tres veces y esperó. Alguien que sabe esperar es alguien que ha aprendido a sobrevivir.\n\n> "No te fíes de quien habla demasiado. En el nuevo mundo, las palabras son un lujo que pocos pueden permitirse."\n\nNunca nos contó de dónde venía. Nosotros tampoco preguntamos.`
-    },
-    { id:3, category:'El Mundo Antes', title:'Cosas que ya no existen: una lista incompleta',
-      excerpt:'El café caliente. El ruido del tráfico. La luz de las farolas. Los lunes que odiábamos.',
-      date:'Día 67 del colapso', read_time:'3 min',
-      body:`Empecé esta lista para no olvidar. Ahora ya no sé si olvidar sería lo más compasivo.\n\nEl olor a pan recién horneado a las siete de la mañana. La notificación del móvil. El sonido de un partido de fútbol viniendo del piso de arriba.\n\n*El aburrimiento. Dios mío, cuánto echo de menos el aburrimiento.*\n\nEchar de menos cosas pequeñas es lo que te rompe. No la violencia, no el miedo. Es recordar que una vez tuviste una vida tan llena de pequeñeces que te quejabas de ellas.\n\n> "El apocalipsis no te quita el futuro. Te quita el pasado. Te hace darte cuenta de todo lo que no valoraste mientras lo tenías."\n\nLa lista sigue creciendo cada noche, cuando no puedo dormir.`
-    }
-  ];
-
-  let localPosts = JSON.parse(localStorage.getItem('apoc_v2') || 'null') || SAMPLES;
-  const saveLocal = posts => localStorage.setItem('apoc_v2', JSON.stringify(posts));
-
   // ── CARGAR ──
   async function loadPosts() {
     if (!configured || !db) return localPosts;
@@ -834,6 +941,7 @@
       list.appendChild(el);
     });
   }
+
   // ── OPEN POST ──
   let currentPostId = null;
 
