@@ -884,7 +884,113 @@
     showToast(cloud ? '// Registro transmitido a la nube' : '// Registro guardado localmente');
     showView('home');
   }
+ // ── COMMENTS ──
+  const localComments = JSON.parse(localStorage.getItem('apoc_comments') || '{}');
+  const saveLocalComments = () => localStorage.setItem('apoc_comments', JSON.stringify(localComments));
 
+  function randomSurvivorId() {
+    return 'Superviviente #' + String(Math.floor(Math.random() * 9000) + 1000);
+  }
+
+  function formatCommentDate(iso) {
+    try {
+      return new Date(iso).toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
+    } catch { return '—'; }
+  }
+
+  function initials(name) {
+    return name.split(' ').map(w => w[0] || '').join('').substring(0, 2).toUpperCase() || '??';
+  }
+
+  async function loadComments(postId) {
+    const list  = document.getElementById('comments-list');
+    const count = document.getElementById('comments-count');
+    list.innerHTML = '<div class="comments-loading"><div class="spinner"></div>&nbsp;Recuperando transmisiones…</div>';
+
+    let comments = [];
+
+    if (configured && db) {
+      try {
+        const { data, error } = await db.from('comments')
+          .select('*').eq('post_id', postId).order('created_at', { ascending: true });
+        if (error) throw error;
+        comments = data || [];
+      } catch(e) {
+        console.warn('Comentarios fallback local:', e.message);
+        comments = localComments[postId] || [];
+      }
+    } else {
+      comments = localComments[postId] || [];
+    }
+
+    count.textContent = comments.length + (comments.length === 1 ? ' transmisión' : ' transmisiones');
+    renderComments(comments);
+  }
+
+  function renderComments(comments) {
+    const list = document.getElementById('comments-list');
+    list.innerHTML = '';
+    if (!comments.length) {
+      list.innerHTML = '<div class="comments-empty">— Sin transmisiones todavía. Sé el primero en dejar señal. —</div>';
+      return;
+    }
+    comments.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'comment-item';
+      el.innerHTML = `
+        <div class="comment-avatar">${initials(c.author)}</div>
+        <div>
+          <div class="comment-author">
+            ${c.author}
+            <span class="comment-date">${formatCommentDate(c.created_at || new Date().toISOString())}</span>
+          </div>
+          <div class="comment-body">${c.body.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+        </div>`;
+      list.appendChild(el);
+    });
+  }
+
+  async function submitComment() {
+    const nameRaw = document.getElementById('comment-name').value.trim();
+    const body    = document.getElementById('comment-body').value.trim();
+    const btn     = document.getElementById('comment-btn');
+
+    if (!body) { showToast('ERROR // El comentario no puede estar vacío', false); return; }
+    if (!currentPostId) return;
+
+    const author = nameRaw || randomSurvivorId();
+    btn.disabled = true; btn.textContent = '▶ Enviando…';
+
+    const comment = {
+      post_id: currentPostId,
+      author,
+      body,
+      created_at: new Date().toISOString()
+    };
+
+    let saved = false;
+
+    if (configured && db) {
+      try {
+        const { error } = await db.from('comments').insert([comment]);
+        if (error) throw error;
+        saved = true;
+      } catch(e) { console.warn('Comentario guardado localmente:', e.message); }
+    }
+
+    if (!saved) {
+      if (!localComments[currentPostId]) localComments[currentPostId] = [];
+      localComments[currentPostId].push(comment);
+      saveLocalComments();
+    }
+
+    document.getElementById('comment-name').value = '';
+    document.getElementById('comment-body').value = '';
+    btn.disabled = false; btn.textContent = '▶ Enviar transmisión';
+
+    showToast('// Transmisión recibida — gracias, ' + author);
+    loadComments(currentPostId);
+  }
   // ── TOAST ──
   function showToast(msg, ok = true) {
     const t = document.getElementById('toast');
